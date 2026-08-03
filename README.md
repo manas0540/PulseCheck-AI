@@ -2,12 +2,12 @@
 
 **Know your load before it knows you.**
 
-[![Live Demo](https://img.shields.io/badge/demo-live-5EEAD4?style=for-the-badge)](https://<your-username>.github.io/pulsecheck-ai/)
+[![Live Demo](https://img.shields.io/badge/demo-live-5EEAD4?style=for-the-badge)](https://manas0540.github.io/PulseCheck-AI/)
 ![Python](https://img.shields.io/badge/python-3.10+-blue?style=for-the-badge)
 ![FastAPI](https://img.shields.io/badge/FastAPI-backend-teal?style=for-the-badge)
 ![License](https://img.shields.io/badge/license-MIT-lightgrey?style=for-the-badge)
 
-**[🔴 Live static demo →](https://<your-username>.github.io/pulsecheck-ai/)** (client-side only, no backend needed — see [Deploying the demo](#deploying-the-demo-on-github-pages))
+**[🔴 Live static demo →](https://manas0540.github.io/PulseCheck-AI/)** 
 
 PulseCheck AI is an end-to-end digital-wellness platform that turns a short check-in — screen time, sleep, stress, exercise, mood — into a real-time **burnout/stress risk score**, a **wellness persona**, and **personalised, actionable guidance**, delivered through either a web dashboard or a guided conversational check-in.
 
@@ -15,9 +15,6 @@ It's a full rebuild of an earlier EDA-only notebook project into a real applied 
 
 > ⚠️ **Disclaimer:** PulseCheck AI is an educational/portfolio project, not a medical device. It does not diagnose any condition and is not a substitute for professional mental health care. If you or someone you know is in crisis, please contact a local emergency service or crisis line (see [Crisis resources](#crisis-resources) below).
 
-📄 Also in this repo: [`PulseCheck_AI_One_Pager.pdf`](PulseCheck_AI_One_Pager.pdf) (one-page project summary), [`SHOWCASE_KIT.md`](SHOWCASE_KIT.md) (ready-to-use LinkedIn / resume / portfolio / GitHub copy), and [`DEPLOYMENT_GUIDE.md`](DEPLOYMENT_GUIDE.md) (step-by-step, zero to live).
-
----
 
 ## Screenshots
 
@@ -39,30 +36,8 @@ The original project was a notebook that ran exploratory data analysis (skewness
 3. **Act** — a rule-based recommendation engine returns 2–4 concrete, immediate actions (breathing exercise, digital detox block, sleep nudge, movement break), prioritised by that person's biggest risk driver.
 4. **Escalate** — if the risk score crosses **8.5/10**, the platform stops recommending self-help tips and instead surfaces real crisis-support resources, per the project's original "serious stage" design requirement.
 
-## Run the full-stack app (local)
 
-```
-git clone https://github.com/<your-username>/pulsecheck-ai.git
-cd pulsecheck-ai
-pip install -r requirements.txt
-python src/train_models.py          # trains & saves the models (first run only)
-uvicorn backend.main:app --reload --port 8000
-```
 
-Then open **http://localhost:8000** — the FastAPI app serves the frontend directly, so there's nothing else to run.
-
-## Deploying the demo on GitHub Pages
-
-The `/docs` folder is a **fully self-contained static build** — the real trained persona-clustering math and risk formula ported into vanilla JS, no backend required (see [`docs/README.md`](docs/README.md) for exactly what's ported vs. what's simplified). This is what makes a *free, live, clickable demo link* possible for a portfolio or resume.
-
-1. Push this repo to GitHub.
-2. Go to **Settings → Pages**.
-3. Under **Build and deployment**, set **Source: Deploy from a branch**.
-4. Set **Branch: `main`**, folder **`/docs`**, then **Save**.
-5. GitHub publishes it at `https://<your-username>.github.io/<repo-name>/` within a minute or two.
-6. Update the badge/link at the top of this README with your real URL.
-
-No build step, no secrets, no server costs.
 
 ## Architecture
 
@@ -116,11 +91,6 @@ Trained on the 500-row `digital_wellness_raw.csv` dataset (80/20 split):
 
 Regenerate at any time:
 
-```bash
-python src/train_models.py
-```
-
-This writes `models/metrics.json` with the full report, plus each persona's centroid profile.
 
 ### A design note on why the score isn't purely the model's output
 
@@ -179,7 +149,7 @@ Full interactive docs are auto-generated at **`/docs`** once the server is runni
 | `/api/chat/start` | POST | session_id | opening chatbot message |
 | `/api/chat/message` | POST | session_id, message | next chatbot message; full result (incl. `ai_explanation`) once all questions are answered |
 
-## LLM Integration (optional, free-tier)
+## LLM Integration (free-tier)
 
 By default, every result includes an `ai_explanation` — a short, plain-language read on *why* the score is what it is, generated from the exact same numbers the score was computed from:
 
@@ -208,12 +178,17 @@ Design guarantees:
 
 ## Crisis resources
 
-If your check-in score comes back Critical (>8.5/10), the app itself surfaces these, but they're worth having regardless:
+## Crisis Support Resources
 
-- **US:** 988 Suicide & Crisis Lifeline — call or text **988**
-- **UK & Ireland:** Samaritans — call **116 123**
-- **India:** Tele-MANAS — call **14416**
-- **Elsewhere:** [findahelpline.com](https://findahelpline.com) to find a free, confidential local helpline
+If a check-in result indicates a **critical risk level (>8.5/10)**, PulseCheck AI prioritizes safety by displaying crisis support resources instead of only providing wellness recommendations.
+
+If you or someone you know needs immediate support:
+
+- 🇮🇳 **India:** Tele-MANAS Mental Health Helpline — Call **14416** or **1-800-891-4416**  
+  https://telemanas.mohfw.gov.in/
+
+
+
 
 ## Roadmap
 
