@@ -1,0 +1,51 @@
+{
+  "risk_model": {
+    "mae": 0.1799,
+    "r2": 0.9703,
+    "n_train": 400,
+    "n_test": 100
+  },
+  "persona_model": {
+    "k": 4,
+    "persona_names": {
+      "1": "Balanced Thriver",
+      "0": "Quietly Drifting",
+      "3": "Wired & Tired",
+      "2": "Overloaded & At-Risk"
+    },
+    "centroid_summary": {
+      "Quietly Drifting": {
+        "Daily_Screen_Time(hrs)": 5.65,
+        "Sleep_Quality(1-10)": 6.13,
+        "Stress_Level(1-10)": 6.75,
+        "Exercise_Frequency(week)": 3.8,
+        "Happiness_Index(1-10)": 8.5,
+        "Risk_Score": 3.65
+      },
+      "Balanced Thriver": {
+        "Daily_Screen_Time(hrs)": 3.47,
+        "Sleep_Quality(1-10)": 8.03,
+        "Stress_Level(1-10)": 4.95,
+        "Exercise_Frequency(week)": 2.59,
+        "Happiness_Index(1-10)": 9.84,
+        "Risk_Score": 2.16
+      },
+      "Overloaded & At-Risk": {
+        "Daily_Screen_Time(hrs)": 7.48,
+        "Sleep_Quality(1-10)": 4.67,
+        "Stress_Level(1-10)": 8.32,
+        "Exercise_Frequency(week)": 2.27,
+        "Happiness_Index(1-10)": 6.41,
+        "Risk_Score": 5.35
+      },
+      "Wired & Tired": {
+        "Daily_Screen_Time(hrs)": 5.6,
+        "Sleep_Quality(1-10)": 6.31,
+        "Stress_Level(1-10)": 6.53,
+        "Exercise_Frequency(week)": 1.28,
+        "Happiness_Index(1-10)": 8.67,
+        "Risk_Score": 3.76
+      }
+    }
+  }
+}

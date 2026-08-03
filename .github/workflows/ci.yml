@@ -1,0 +1,77 @@
+name: CI
+
+# What this does: on every push/PR, spins up a clean Python environment,
+# retrains the models from the raw dataset, starts the FastAPI server, and
+# hits it with real requests (normal check-in, critical/escalation check-in,
+# and the chat flow) to make sure nothing is broken.
+#
+# What this does NOT do: host the live app. GitHub Actions runners are
+# ephemeral - they spin up, run the job, and shut down. There's no
+# persistent server here for people to actually use. For that, see
+# "Deploying a live backend" in the main README (Render/Railway/Fly.io),
+# or use the docs/ folder + GitHub Pages for a zero-backend static demo.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  smoke-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Train models from raw data
+        run: python src/train_models.py
+
+      - name: Start server and run smoke tests
+        run: |
+          uvicorn backend.main:app --port 8000 &
+          SERVER_PID=$!
+          for i in $(seq 1 15); do
+            curl -s -m 2 http://127.0.0.1:8000/api/health > /dev/null && break
+            sleep 1
+          done
+
+          echo "--- health check ---"
+          curl -sf http://127.0.0.1:8000/api/health
+
+          echo "--- home page ---"
+          curl -sf -o /dev/null -w "HTTP %{http_code}\n" http://127.0.0.1:8000/
+
+          echo "--- normal check-in ---"
+          curl -sf -X POST http://127.0.0.1:8000/api/predict \
+            -H "Content-Type: application/json" \
+            -d '{"age":24,"screen_time_hrs":5,"sleep_quality":7,"stress_level":5,"days_without_social_media":2,"exercise_frequency":2,"happiness_index":7}'
+
+          echo ""
+          echo "--- critical check-in (escalation must fire) ---"
+          RESPONSE=$(curl -sf -X POST http://127.0.0.1:8000/api/predict \
+            -H "Content-Type: application/json" \
+            -d '{"age":22,"screen_time_hrs":13,"sleep_quality":1,"stress_level":10,"days_without_social_media":0,"exercise_frequency":0,"happiness_index":1}')
+          echo "$RESPONSE"
+          echo "$RESPONSE" | python3 -c "import json,sys; d=json.load(sys.stdin); assert d['escalate'] is True, 'escalation did not fire for a critical check-in'; print('escalation OK')"
+
+          echo "--- guided chat flow ---"
+          curl -sf -X POST http://127.0.0.1:8000/api/chat/start \
+            -H "Content-Type: application/json" -d '{"session_id":"ci-test"}'
+
+          kill $SERVER_PID
+
+      # This step is informational only - it does NOT publish anything.
+      # It just confirms the static demo file is present and non-empty,
+      # since docs/index.html is what GitHub Pages serves.
+      - name: Sanity-check static demo build exists
+        run: |
+          test -s docs/index.html && echo "docs/index.html present ($(wc -c < docs/index.html) bytes)"

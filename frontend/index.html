@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PulseCheck AI — Know your load before it knows you</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Manrope:wght@400;500;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#10142B;
+    --surface:#1A2044;
+    --surface-2:#232B52;
+    --line:#31396A;
+    --teal:#5EEAD4;
+    --violet:#A78BFA;
+    --rose:#FB7185;
+    --text:#F3F1EC;
+    --muted:#8B93B8;
+    --radius:18px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Manrope',sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,.display{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    letter-spacing:-0.01em;
+    margin:0;
+  }
+  .mono{font-family:'IBM Plex Mono',monospace;}
+  a{color:inherit;}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 24px;}
+
+  nav{
+    position:sticky; top:0; z-index:50;
+    background:rgba(16,20,43,0.85);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  nav .wrap{display:flex;align-items:center;justify-content:space-between;height:64px;}
+  .brand{display:flex;align-items:center;gap:10px;font-family:'Fraunces',serif;font-weight:600;font-size:1.15rem;}
+  .brand-mark{width:22px;height:22px;flex:none;}
+  .nav-links{display:flex;gap:28px;font-size:0.92rem;color:var(--muted);}
+  .nav-links a{text-decoration:none;transition:color .15s;}
+  .nav-links a:hover{color:var(--teal);}
+
+  .hero{padding:88px 0 64px;position:relative;overflow:hidden;}
+  .hero .wrap{display:grid;grid-template-columns:1.1fr 0.9fr;gap:48px;align-items:center;}
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:8px;
+    color:var(--teal); font-family:'IBM Plex Mono',monospace; font-size:0.78rem;
+    letter-spacing:0.08em; text-transform:uppercase; margin-bottom:18px;
+  }
+  .eyebrow::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--teal);box-shadow:0 0 0 4px rgba(94,234,212,0.15);}
+  .hero h1{font-size:clamp(2.1rem,4vw,3.4rem);line-height:1.08;}
+  .hero h1 em{font-style:italic;color:var(--teal);}
+  .hero p.sub{color:var(--muted);font-size:1.08rem;line-height:1.6;margin-top:20px;max-width:46ch;}
+  .cta-row{display:flex;gap:14px;margin-top:32px;flex-wrap:wrap;}
+  .btn{
+    border:none;border-radius:999px;padding:14px 26px;font-family:'Manrope',sans-serif;
+    font-weight:700;font-size:0.95rem;cursor:pointer;transition:transform .15s, box-shadow .15s;
+  }
+  .btn-primary{background:var(--teal);color:#0B2521;}
+  .btn-primary:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(94,234,212,0.25);}
+  .btn-ghost{background:transparent;color:var(--text);border:1px solid var(--line);}
+  .btn-ghost:hover{border-color:var(--violet);color:var(--violet);}
+
+  .wave-card{
+    background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+    padding:26px; position:relative;
+  }
+  .wave-card .label{display:flex;justify-content:space-between;font-family:'IBM Plex Mono',monospace;font-size:0.75rem;color:var(--muted);margin-bottom:10px;}
+  .wave-card svg{width:100%;height:140px;display:block;}
+
+  section{padding:64px 0;}
+  .section-head{max-width:60ch;margin-bottom:40px;}
+  .section-head .eyebrow{margin-bottom:10px;}
+  .section-head h2{font-size:clamp(1.6rem,3vw,2.2rem);}
+  .section-head p{color:var(--muted);margin-top:12px;line-height:1.6;}
+
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+  .step-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:24px;}
+  .step-num{font-family:'IBM Plex Mono',monospace;color:var(--violet);font-size:0.8rem;margin-bottom:14px;}
+  .step-card h3{font-size:1.1rem;margin-bottom:8px;}
+  .step-card p{color:var(--muted);font-size:0.92rem;line-height:1.55;margin:0;}
+
+  #checkin{background:var(--surface);border-top:1px solid var(--line);border-bottom:1px solid var(--line);}
+  .checkin-grid{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:start;}
+  .field{margin-bottom:20px;}
+  .field label{display:flex;justify-content:space-between;font-size:0.88rem;color:var(--muted);margin-bottom:8px;}
+  .field .val{font-family:'IBM Plex Mono',monospace;color:var(--teal);}
+  input[type=range]{
+    width:100%; height:4px; border-radius:2px; background:var(--line);
+    -webkit-appearance:none; appearance:none;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;appearance:none;width:18px;height:18px;border-radius:50%;
+    background:var(--teal);cursor:pointer;border:3px solid var(--bg);box-shadow:0 0 0 1px var(--teal);
+  }
+
+  .result-panel{
+    background:var(--surface-2);border:1px solid var(--line);border-radius:var(--radius);
+    padding:28px; min-height:420px; display:flex; flex-direction:column; gap:20px;
+  }
+  .gauge-wrap{display:flex;align-items:center;gap:20px;}
+  .gauge-num{font-family:'Fraunces',serif;font-size:2.6rem;font-weight:600;}
+  .tier-pill{
+    display:inline-block;padding:4px 12px;border-radius:999px;font-size:0.78rem;
+    font-family:'IBM Plex Mono',monospace;letter-spacing:0.03em;
+  }
+  .tier-Low{background:rgba(94,234,212,0.15);color:var(--teal);}
+  .tier-Moderate{background:rgba(167,139,250,0.18);color:var(--violet);}
+  .tier-Elevated{background:rgba(251,146,60,0.18);color:#FB923C;}
+  .tier-Critical{background:rgba(251,113,133,0.18);color:var(--rose);}
+
+  .persona-badge{font-size:1rem;color:var(--text);margin-top:4px;}
+  .tips-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px;}
+  .tips-list li{
+    background:var(--surface);border:1px solid var(--line);border-radius:12px;
+    padding:12px 14px;font-size:0.9rem;line-height:1.5;color:var(--text);
+    display:flex;gap:10px;
+  }
+  .tips-list li::before{content:"→";color:var(--teal);flex:none;}
+  .crisis-banner{
+    background:rgba(251,113,133,0.1);border:1px solid var(--rose);border-radius:12px;
+    padding:16px; font-size:0.88rem; line-height:1.6;
+  }
+  .crisis-banner h4{color:var(--rose);margin:0 0 8px;font-family:'Manrope';font-size:0.95rem;}
+  .crisis-banner ul{margin:8px 0 0;padding-left:18px;}
+  .placeholder{color:var(--muted);font-size:0.92rem;margin:auto;text-align:center;}
+
+  .insight-card{
+    background:linear-gradient(135deg, rgba(167,139,250,0.12), rgba(94,234,212,0.08));
+    border:1px solid var(--violet);border-radius:12px;padding:14px 16px;font-size:0.9rem;line-height:1.55;
+  }
+  .insight-card .insight-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+  .insight-card .insight-head span{font-family:'IBM Plex Mono',monospace;font-size:0.72rem;color:var(--violet);letter-spacing:0.04em;text-transform:uppercase;}
+  .insight-source{font-family:'IBM Plex Mono',monospace;font-size:0.66rem;color:var(--muted);padding:2px 8px;border-radius:999px;border:1px solid var(--line);}
+
+  .metrics-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
+  .metric{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;text-align:center;}
+  .metric .num{font-family:'Fraunces',serif;font-size:1.7rem;color:var(--teal);}
+  .metric .lbl{color:var(--muted);font-size:0.78rem;margin-top:4px;}
+
+  footer{border-top:1px solid var(--line);padding:32px 0;color:var(--muted);font-size:0.85rem;}
+  footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+
+  #chat-fab{
+    position:fixed;bottom:26px;right:26px;z-index:100;
+    width:58px;height:58px;border-radius:50%;background:var(--violet);
+    border:none;cursor:pointer;box-shadow:0 10px 30px rgba(167,139,250,0.35);
+    display:flex;align-items:center;justify-content:center;
+  }
+  #chat-panel{
+    position:fixed;bottom:96px;right:26px;z-index:100;
+    width:340px;max-height:480px;background:var(--surface);border:1px solid var(--line);
+    border-radius:16px;display:none;flex-direction:column;overflow:hidden;
+    box-shadow:0 24px 60px rgba(0,0,0,0.4);
+  }
+  #chat-panel.open{display:flex;}
+  #chat-head{padding:14px 16px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;}
+  #chat-head span{font-family:'Fraunces',serif;font-weight:600;}
+  #chat-body{flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:10px;font-size:0.87rem;}
+  .msg{padding:10px 12px;border-radius:12px;line-height:1.5;max-width:88%;white-space:pre-line;}
+  .msg.bot{background:var(--surface-2);align-self:flex-start;}
+  .msg.user{background:var(--teal);color:#0B2521;align-self:flex-end;}
+  #chat-input-row{display:flex;border-top:1px solid var(--line);}
+  #chat-input{flex:1;background:transparent;border:none;color:var(--text);padding:12px;font-family:'Manrope';font-size:0.87rem;}
+  #chat-input:focus{outline:none;}
+  #chat-send{background:none;border:none;color:var(--teal);padding:0 14px;cursor:pointer;font-weight:700;}
+  .close-x{background:none;border:none;color:var(--muted);cursor:pointer;font-size:1rem;}
+
+  @media (max-width:860px){
+    .hero .wrap{grid-template-columns:1fr;}
+    .steps{grid-template-columns:1fr;}
+    .checkin-grid{grid-template-columns:1fr;}
+    .metrics-grid{grid-template-columns:repeat(2,1fr);}
+    #chat-panel{width:calc(100vw - 32px);right:16px;}
+    #chat-fab{right:16px;}
+  }
+  :focus-visible{outline:2px solid var(--teal);outline-offset:2px;}
+  @media (prefers-reduced-motion:reduce){
+    * {animation:none !important; transition:none !important;}
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <div class="brand">
+      <svg class="brand-mark" viewBox="0 0 24 24" fill="none"><path d="M2 12h4l2-7 4 14 3-10 2 3h5" stroke="#5EEAD4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      PulseCheck AI
+    </div>
+    <div class="nav-links">
+      <a href="#how">How it works</a>
+      <a href="#checkin">Check-in</a>
+      <a href="#model">The model</a>
+    </div>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="wrap">
+    <div>
+      <div class="eyebrow">Digital wellness · risk detection</div>
+      <h1>Know your load <em>before</em><br>it knows you.</h1>
+      <p class="sub">PulseCheck reads the everyday signals — screen time, sleep, stress, movement — and turns them into a real-time risk score, a wellness persona, and the exact next step to take. No account. No judgement. Just a pulse check.</p>
+      <div class="cta-row">
+        <button class="btn btn-primary" onclick="document.getElementById('checkin').scrollIntoView({behavior:'smooth'})">Start your check-in</button>
+        <button class="btn btn-ghost" onclick="document.getElementById('model').scrollIntoView({behavior:'smooth'})">See the model</button>
+      </div>
+    </div>
+    <div class="wave-card">
+      <div class="label"><span>LIVE SIGNAL</span><span class="mono" id="hero-tier">Balanced</span></div>
+      <svg viewBox="0 0 400 140" id="hero-wave"></svg>
+    </div>
+  </div>
+</section>
+
+<section id="how">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">How it works</div>
+      <h2>Three inputs. One clear answer.</h2>
+      <p>Everything here runs on a model trained on real check-in data — screen time, sleep, stress, exercise and mood — engineered into a single, explainable risk signal.</p>
+    </div>
+    <div class="steps">
+      <div class="step-card">
+        <div class="step-num">01 / SENSE</div>
+        <h3>Read your current state</h3>
+        <p>A short check-in — or a two-minute chat — captures screen time, sleep quality, stress, exercise and mood.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-num">02 / SCORE</div>
+        <h3>Detect the risk</h3>
+        <p>A trained regression model converts your inputs into a 0-10 risk score, and a clustering model places you into one of four wellness personas.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-num">03 / ACT</div>
+        <h3>Get an immediate next step</h3>
+        <p>Breathing, movement, digital-detox or sleep guidance tailored to your biggest risk driver — and a direct line to real support if your score crosses a serious threshold.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="checkin">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">Guided check-in</div>
+      <h2>How are you doing right now?</h2>
+      <p>Move the sliders to match how the last few days have actually felt. Your result updates on the right when you run it.</p>
+    </div>
+
+    <div class="checkin-grid">
+      <div>
+        <div class="field">
+          <label>Age <span class="val" id="v-age">24</span></label>
+          <input type="range" id="age" min="10" max="80" value="24">
+        </div>
+        <div class="field">
+          <label>Daily screen time (hrs) <span class="val" id="v-screen">5.0</span></label>
+          <input type="range" id="screen" min="0" max="14" step="0.1" value="5">
+        </div>
+        <div class="field">
+          <label>Sleep quality (1-10) <span class="val" id="v-sleep">7</span></label>
+          <input type="range" id="sleep" min="1" max="10" value="7">
+        </div>
+        <div class="field">
+          <label>Stress level (1-10) <span class="val" id="v-stress">5</span></label>
+          <input type="range" id="stress" min="1" max="10" value="5">
+        </div>
+        <div class="field">
+          <label>Days since last social-media break <span class="val" id="v-detox">2</span></label>
+          <input type="range" id="detox" min="0" max="14" value="2">
+        </div>
+        <div class="field">
+          <label>Exercise sessions this week <span class="val" id="v-ex">2</span></label>
+          <input type="range" id="ex" min="0" max="10" value="2">
+        </div>
+        <div class="field">
+          <label>Happiness right now (1-10) <span class="val" id="v-happy">7</span></label>
+          <input type="range" id="happy" min="1" max="10" value="7">
+        </div>
+        <button class="btn btn-primary" id="run-checkin" style="width:100%;margin-top:8px;">Run my check-in</button>
+      </div>
+
+      <div class="result-panel" id="result-panel">
+        <p class="placeholder">Adjust the sliders and run your check-in to see your risk score, persona and recommendations here.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="model">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">The model</div>
+      <h2>What's actually running under the hood</h2>
+      <p>A RandomForest regressor predicts the engineered risk score from raw check-in features, and a KMeans model clusters people into four wellness personas. Both are trained on the 500-row digital-wellness dataset shipped in this repo.</p>
+    </div>
+    <div class="metrics-grid" id="metrics-grid">
+      <div class="metric"><div class="num">0.97</div><div class="lbl">R² (risk model)</div></div>
+      <div class="metric"><div class="num">0.18</div><div class="lbl">MAE (risk model)</div></div>
+      <div class="metric"><div class="num">4</div><div class="lbl">wellness personas</div></div>
+      <div class="metric"><div class="num">500</div><div class="lbl">training rows</div></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div>PulseCheck AI — an open-source digital wellness &amp; guidance project.</div>
+    <div>Not a substitute for professional mental health care.</div>
+  </div>
+</footer>
+
+<button id="chat-fab" aria-label="Open guided check-in chat" onclick="toggleChat()">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" stroke="#10142B" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+</button>
+
+<div id="chat-panel">
+  <div id="chat-head">
+    <span>PulseCheck guide</span>
+    <button class="close-x" onclick="toggleChat()">✕</button>
+  </div>
+  <div id="chat-body"></div>
+  <div id="chat-input-row">
+    <input id="chat-input" placeholder="Type your answer..." onkeydown="if(event.key==='Enter')sendChat()">
+    <button id="chat-send" onclick="sendChat()">Send</button>
+  </div>
+</div>
+
+<script>
+const API_BASE = window.location.origin;
+
+function buildWavePath(amplitude, frequency, phase, w, h){
+  const mid = h/2;
+  let d = `M0 ${mid}`;
+  for(let x=0;x<=w;x+=4){
+    const y = mid + Math.sin((x*frequency)+phase) * amplitude;
+    d += ` L${x} ${y}`;
+  }
+  return d;
+}
+const heroSvg = document.getElementById('hero-wave');
+let phase = 0;
+function animateHero(){
+  phase += 0.10;
+  const path = buildWavePath(28, 0.045, phase, 400, 140);
+  heroSvg.innerHTML = `<path d="${path}" stroke="#5EEAD4" stroke-width="2.5" fill="none" stroke-linecap="round"/>`;
+  requestAnimationFrame(animateHero);
+}
+if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+  animateHero();
+} else {
+  heroSvg.innerHTML = `<path d="${buildWavePath(20,0.045,0,400,140)}" stroke="#5EEAD4" stroke-width="2.5" fill="none"/>`;
+}
+
+const bind = (id,label,fmt)=>{
+  const el = document.getElementById(id);
+  const out = document.getElementById(label);
+  const update = ()=> out.textContent = fmt ? fmt(el.value) : el.value;
+  el.addEventListener('input', update);
+  update();
+};
+bind('age','v-age');
+bind('screen','v-screen', v=>parseFloat(v).toFixed(1));
+bind('sleep','v-sleep');
+bind('stress','v-stress');
+bind('detox','v-detox');
+bind('ex','v-ex');
+bind('happy','v-happy');
+
+function gaugeSvg(score, tier){
+  const pct = score/10;
+  const r = 46, c = 2*Math.PI*r;
+  const colorMap = {Low:'#5EEAD4',Moderate:'#A78BFA',Elevated:'#FB923C',Critical:'#FB7185'};
+  const color = colorMap[tier] || '#5EEAD4';
+  return `
+  <svg width="110" height="110" viewBox="0 0 110 110">
+    <circle cx="55" cy="55" r="${r}" stroke="#31396A" stroke-width="10" fill="none"/>
+    <circle cx="55" cy="55" r="${r}" stroke="${color}" stroke-width="10" fill="none"
+      stroke-dasharray="${c}" stroke-dashoffset="${c*(1-pct)}" stroke-linecap="round"
+      transform="rotate(-90 55 55)"/>
+  </svg>`;
+}
+
+async function runCheckin(){
+  const payload = {
+    age: parseInt(document.getElementById('age').value),
+    screen_time_hrs: parseFloat(document.getElementById('screen').value),
+    sleep_quality: parseFloat(document.getElementById('sleep').value),
+    stress_level: parseFloat(document.getElementById('stress').value),
+    days_without_social_media: parseFloat(document.getElementById('detox').value),
+    exercise_frequency: parseFloat(document.getElementById('ex').value),
+    happiness_index: parseFloat(document.getElementById('happy').value),
+  };
+
+  const panel = document.getElementById('result-panel');
+  panel.innerHTML = '<p class="placeholder">Scoring your check-in…</p>';
+
+  try{
+    const res = await fetch(`${API_BASE}/api/predict`, {
+      method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+
+    let crisisHtml = '';
+    if(data.escalate){
+      crisisHtml = `<div class="crisis-banner">
+        <h4>Your score indicates serious strain</h4>
+        <p>${data.headline}</p>
+        <ul>${data.crisis_resources.map(r=>`<li><strong>${r.name}</strong> (${r.region}) — ${r.contact}</li>`).join('')}</ul>
+      </div>`;
+    }
+
+    let insightHtml = '';
+    if(data.ai_explanation && data.ai_explanation.text){
+      const sourceLabel = data.ai_explanation.source === 'llm' ? 'LLM-generated' : 'rule-based';
+      insightHtml = `<div class="insight-card">
+        <div class="insight-head"><span>AI insight</span><span class="insight-source">${sourceLabel}</span></div>
+        ${data.ai_explanation.text}
+      </div>`;
+    }
+
+    panel.innerHTML = `
+      <div class="gauge-wrap">
+        ${gaugeSvg(data.risk_score, data.risk_tier)}
+        <div>
+          <div class="gauge-num">${data.risk_score}<span style="font-size:1rem;color:var(--muted)">/10</span></div>
+          <span class="tier-pill tier-${data.risk_tier}">${data.risk_tier} risk</span>
+        </div>
+      </div>
+      <div>
+        <div class="persona-badge">Persona: <strong>${data.persona}</strong></div>
+        <p style="color:var(--muted);font-size:0.9rem;margin-top:6px;">${data.headline}</p>
+      </div>
+      ${insightHtml}
+      <ul class="tips-list">${data.tips.map(t=>`<li>${t}</li>`).join('')}</ul>
+      ${crisisHtml}
+    `;
+
+    document.getElementById('hero-tier').textContent = data.risk_tier;
+  }catch(e){
+    panel.innerHTML = '<p class="placeholder">Couldn\'t reach the PulseCheck API. Make sure the backend is running (see README).</p>';
+  }
+}
+document.getElementById('run-checkin').addEventListener('click', runCheckin);
+
+let chatOpen = false;
+let sessionId = 'sess-' + Math.random().toString(36).slice(2);
+function toggleChat(){
+  chatOpen = !chatOpen;
+  document.getElementById('chat-panel').classList.toggle('open', chatOpen);
+  if(chatOpen && document.getElementById('chat-body').children.length === 0){
+    startChat();
+  }
+}
+function addMsg(text, who){
+  const body = document.getElementById('chat-body');
+  const div = document.createElement('div');
+  div.className = `msg ${who}`;
+  div.textContent = text;
+  body.appendChild(div);
+  body.scrollTop = body.scrollHeight;
+}
+async function startChat(){
+  const res = await fetch(`${API_BASE}/api/chat/start`, {
+    method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({session_id: sessionId})
+  });
+  const data = await res.json();
+  addMsg(data.message, 'bot');
+}
+async function sendChat(){
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if(!text) return;
+  addMsg(text, 'user');
+  input.value = '';
+  const res = await fetch(`${API_BASE}/api/chat/message`, {
+    method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({session_id: sessionId, message: text})
+  });
+  const data = await res.json();
+  addMsg(data.message, 'bot');
+  if(data.crisis_resources && data.crisis_resources.length){
+    const extra = data.crisis_resources.map(r=>`${r.name} (${r.region}): ${r.contact}`).join('\n');
+    addMsg(extra, 'bot');
+  }
+}
+</script>
+</body>
+</html>

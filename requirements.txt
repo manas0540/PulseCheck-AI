@@ -1,0 +1,17 @@
+pandas>=2.0
+numpy>=1.24
+scikit-learn>=1.3
+scipy>=1.10
+joblib>=1.3
+fastapi>=0.110
+uvicorn[standard]>=0.29
+pydantic>=2.0
+
+# Optional: only needed to enable the LLM-generated explanation layer
+# (src/llm_explainer.py). The app runs fully offline and falls back to a
+# rule-based explanation without either of these. Both providers have a
+# free tier suitable for a portfolio project - Groq is tried first if
+# GROQ_API_KEY is set, then Gemini if GEMINI_API_KEY is set.
+groq>=0.9        # https://console.groq.com - free tier, fast Llama models
+google-genai>=0.3  # https://aistudio.google.com - free tier Gemini (current SDK; the older
+                   # `google-generativeai` package is deprecated as of 2025 - don't use it)
